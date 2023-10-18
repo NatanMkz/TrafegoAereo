@@ -3,13 +3,14 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package trafegoaereo.agents;
+import java.util.ArrayList;
 import java.util.List;
-
+import jade.core.Agent;
 /**
  *
  * @author Natan
  */
-public class Aeroporto {
+public class Aeroporto extends Agent{
     List<Aeronave> aeronaves;
     int quantidadePessoas = 0;
     String enderecoAeroporto = "";    
@@ -25,6 +26,17 @@ public class Aeroporto {
         this.quantidadePessoas = quantidadePessoas;
         this.enderecoAeroporto = enderecoAeroporto;
         this.possuiAviaoNaPista = possuiAviaoNaPista;
+    }
+    
+    public static Aeroporto ConstroiAeroporto()
+    {
+        Aeronave aero1 = Aeronave.ConstroiAeronave();
+        Aeronave aero2 = Aeronave.ConstroiAeronave();
+        Aeronave aero3 = Aeronave.ConstroiAeronave();
+        List<Aeronave> aeronavess = new ArrayList<Aeronave>(){{add(aero1); add(aero2); add(aero3);}}; 
+        
+        
+        return new Aeroporto(aeronavess, 1000, "Navegantes SC-Brasil", false);
     }
     
 }
