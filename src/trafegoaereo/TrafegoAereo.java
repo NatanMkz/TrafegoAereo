@@ -4,17 +4,24 @@
  */
 package trafegoaereo;
 
+import trafegoaereo.agents.Aeronave;
+import trafegoaereo.agents.Aeroporto;
+
 /**
  *
  * @author Natan
  */
 public class TrafegoAereo {
 
+    public static Aeronave aeronave = Aeronave.ConstroiAeronave();
+    public static Aeroporto aeroporto = Aeroporto.ConstroiAeroporto();
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
         // TODO code application logic here
+        
+        aeronave.Setup();
     }
     
 }
