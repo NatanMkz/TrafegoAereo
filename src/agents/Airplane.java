@@ -1,4 +1,4 @@
-package trafegoaereo.agents;
+package agents;
 
 import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
@@ -6,45 +6,37 @@ import jade.core.behaviours.OneShotBehaviour;
 public class Airplane extends Agent {
 
     int maxPassengersCapacity;
-    int passengers;
-    double fuel;
-    double distance;
     String fromAddress;
     String toAddress;
+    double routeConcluded;
+    int passengers;
+    double fuel;
+
+    public Airplane() {
+        this.maxPassengersCapacity = 0;
+        this.passengers = 0;
+        this.routeConcluded = 0;
+        this.fuel = 0;
+        this.fromAddress = "";
+        this.toAddress = "";
+    }
 
     public void setup() {
-        addBehaviour(new WantsPassengers(this.fromAddress, this.maxPassengersCapacity));
-
         /*
          * TODO (comportamentos)
          *   Comportamento que simula a porcentagem já voada do aeroporto A para o B
          *   Comportamento para solicitar pouso da aeronave caso essa porcentagem seja superior a 90%
          *
          * */
-    }
 
-    public Airplane() {
-        this.maxPassengersCapacity = 0;
-        this.passengers = 0;
-        this.distance = 0;
-        this.fuel = 0;
-        this.fromAddress = "";
-        this.toAddress = "";
-    }
+        Object[] args = getArguments();
+        this.maxPassengersCapacity = (int) args[0];
+        this.fromAddress = (String) args[1];
+        this.toAddress = (String) args[2];
 
-    public Airplane(
-            int maxPassengersCapacity,
-            int passengers,
-            double fuel,
-            String fromAddress,
-            String toAddress
-    ) {
-        this.maxPassengersCapacity = maxPassengersCapacity;
-        this.passengers = passengers;
-        this.distance = distance;
-        this.fuel = fuel;
-        this.fromAddress = fromAddress;
-        this.toAddress = toAddress;
+        addBehaviour(new WantsPassengers(this.fromAddress, this.maxPassengersCapacity));
+
+        System.out.println("Sou um avião e vou de " + this.fromAddress + " para " + this.toAddress + ".");
     }
 
     public static class WantsPassengers extends OneShotBehaviour {
@@ -57,10 +49,10 @@ public class Airplane extends Agent {
             this.quantity = quantity;
         }
 
-        @Override
+
         public void action() {
-            
-            // Enviar para o endereço do aeroporto, a quantidade de passageiros desejadas
+            // TODO Enviar para o endereço do aeroporto, a quantidade de passageiros desejadas
+
 
         }
     }
