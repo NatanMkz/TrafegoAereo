@@ -22,6 +22,7 @@ public class Controller extends Agent {
         this.createAirports();
         this.createAirplanes();
 
+        System.out.println("Controller " + this.getName() + " online.");
     }
 
     private void createAirports() {

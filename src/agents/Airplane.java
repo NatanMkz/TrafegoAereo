@@ -1,7 +1,12 @@
 package agents;
 
+import jade.core.AID;
 import jade.core.Agent;
+import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
+import jade.lang.acl.ACLMessage;
+
+import java.io.IOException;
 
 public class Airplane extends Agent {
 
@@ -34,9 +39,10 @@ public class Airplane extends Agent {
         this.fromAddress = (String) args[1];
         this.toAddress = (String) args[2];
 
-        addBehaviour(new WantsPassengers(this.fromAddress, this.maxPassengersCapacity));
+        addBehaviour(new ReceiveMessages(this));
+        addBehaviour(new WantsPassengers(this, this.fromAddress, this.maxPassengersCapacity));
 
-        System.out.println("Sou um avião e vou de " + this.fromAddress + " para " + this.toAddress + ".");
+        System.out.println("Airplane " + this.getName() + " online.");
     }
 
     public static class WantsPassengers extends OneShotBehaviour {
@@ -44,19 +50,52 @@ public class Airplane extends Agent {
         private String airportAddress;
         private int quantity;
 
-        public WantsPassengers(String airportAddress, int quantity) {
+        public WantsPassengers(Agent agent, String airportAddress, int quantity) {
+            super(agent);
             this.airportAddress = airportAddress;
             this.quantity = quantity;
         }
 
-
         public void action() {
-            // TODO Enviar para o endereço do aeroporto, a quantidade de passageiros desejadas
-
-
+            System.out.println("Airplane " + this.myAgent.getName() + " solicitando " + quantity + " passageiros ao " + airportAddress + ".");
+            ACLMessage message = new ACLMessage(ACLMessage.PROPOSE);
+            message.addReceiver(new AID(airportAddress, AID.ISGUID));
+            message.setOntology("wants-passengers");
+            message.setContent(String.valueOf(quantity));
+            this.myAgent.send(message);
         }
     }
 
+    public static class ReceiveMessages extends CyclicBehaviour {
+
+        public ReceiveMessages(Agent agent) {
+            super(agent);
+        }
+
+        @Override
+        public void action() {
+            ACLMessage msg = this.myAgent.receive();
+            Airplane airplane = ((Airplane) this.myAgent);
+
+            if (msg != null) {
+                String ontology = msg.getOntology();
+
+                switch (ontology) {
+                    case "receive-passengers":
+                        airplane.passengers = Integer.parseInt(msg.getContent());
+                        System.out.println(this.myAgent.getName() + ": recebe-passageiro. QTD: " + airplane.passengers);
+
+                        break;
+                    default:
+                        block();
+                }
+
+            } else {
+                block();
+            }
+
+        }
+    }
 
     // TODO Refazer essas funções
 //    public double ChecaQuantidadeCombustivel(double quantidadeGasta) {
