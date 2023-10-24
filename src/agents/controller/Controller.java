@@ -1,4 +1,4 @@
-package agents;
+package agents.controller;
 
 import jade.core.AID;
 import jade.core.Agent;
@@ -32,30 +32,8 @@ public class Controller extends Agent {
     private void createAirports() {
         try {
             AgentContainer container = this.getContainerController();
-            this.airports.add(
-                    new AirportPlane(
-                            container.createNewAgent(
-                                    "Curitiba",
-                                    "agents.Airport",
-                                    new Object[]{
-                                            3,
-                                            container.getAgent("Controlador").getName()
-                                    }
-                            ).getName()
-                    )
-            );
-            this.airports.add(
-                    new AirportPlane(
-                            container.createNewAgent(
-                                    "Floripa",
-                                    "agents.Airport",
-                                    new Object[]{
-                                            5,
-                                            container.getAgent("Controlador").getName()
-                                    }
-                            ).getName()
-                    )
-            );
+            this.airports.add(new AirportPlane(container.createNewAgent("Curitiba", "agents.airport.Airport", new Object[]{3, container.getAgent("Controlador").getName()}).getName()));
+            this.airports.add(new AirportPlane(container.createNewAgent("Floripa", "agents.airport.Airport", new Object[]{5, container.getAgent("Controlador").getName()}).getName()));
 
             for (AirportPlane airport : this.airports) {
                 container.getAgent(airport.airport, true).start();
@@ -68,19 +46,8 @@ public class Controller extends Agent {
     private void createAirplanes() {
         try {
             AgentContainer container = this.getContainerController();
-            Object[] args = new Object[]{
-                    50,
-                    container.getAgent("Curitiba").getName(),
-                    container.getAgent("Floripa").getName(),
-                    container.getAgent("Controlador").getName()
-            };
-            this.airports.get(0).planes.add(
-                    container.createNewAgent(
-                            "Boeing",
-                            "agents.Airplane",
-                            args
-                    ).getName()
-            );
+            Object[] args = new Object[]{50, container.getAgent("Curitiba").getName(), container.getAgent("Floripa").getName(), container.getAgent("Controlador").getName()};
+            this.airports.get(0).planes.add(container.createNewAgent("Boeing", "agents.airplane.Airplane", args).getName());
 
             for (AirportPlane airports : this.airports) {
                 for (String airplane : airports.planes) {
@@ -122,7 +89,7 @@ public class Controller extends Agent {
                         }
                     }
 
-                    this.myAgent.addBehaviour(new QueueToAirport(controller, airportAddress, msg.getSender().getName()));
+                    this.myAgent.addBehaviour(new DepartureToAirport(controller, airportAddress, msg.getSender().getName()));
 
                     break;
                 case "autorize-departure":
@@ -148,19 +115,38 @@ public class Controller extends Agent {
                     refresh.setOntology("departure-finished");
                     controller.send(refresh);
 
+                    break;
+                case "wants-arrival":
+                    System.out.println(controller.getName() + ": wants-arrival. Airplane: " + msg.getSender().getName());
+                    this.myAgent.addBehaviour(new ArrivalToAirport(controller, msg.getContent(), msg.getSender().getName()));
 
+                    break;
+                case "autorize-arrival":
+                    System.out.println(controller.getName() + ": autorize-arrival. Airplane: " + msg.getContent());
+                    ACLMessage messageB = new ACLMessage(ACLMessage.PROPOSE);
+                    messageB.addReceiver(new AID(msg.getContent(), AID.ISGUID));
+                    messageB.setOntology("autorize-arrival");
+                    controller.send(messageB);
+
+                    break;
+                case "arrival-finished":
+                    System.out.println(controller.getName() + ": arrival-finished.");
+                    ACLMessage refresh4 = new ACLMessage(ACLMessage.PROPOSE);
+                    refresh4.addReceiver(new AID(msg.getContent(), AID.ISGUID));
+                    refresh4.setOntology("arrival-finished");
+                    controller.send(refresh4);
                     break;
             }
         }
 
     }
 
-    public static class QueueToAirport extends OneShotBehaviour {
+    public static class ArrivalToAirport extends OneShotBehaviour {
 
         private final String airport;
         private final String airplane;
 
-        public QueueToAirport(Agent agent, String airport, String airplane) {
+        public ArrivalToAirport(Agent agent, String airport, String airplane) {
             super(agent);
 
             this.airport = airport;
@@ -171,7 +157,29 @@ public class Controller extends Agent {
         public void action() {
             ACLMessage message = new ACLMessage(ACLMessage.PROPOSE);
             message.addReceiver(new AID(this.airport, AID.ISGUID));
-            message.setOntology("queue-plane");
+            message.setOntology("arrival-plane");
+            message.setContent(String.valueOf(this.airplane));
+            this.myAgent.send(message);
+        }
+    }
+
+    public static class DepartureToAirport extends OneShotBehaviour {
+
+        private final String airport;
+        private final String airplane;
+
+        public DepartureToAirport(Agent agent, String airport, String airplane) {
+            super(agent);
+
+            this.airport = airport;
+            this.airplane = airplane;
+        }
+
+        @Override
+        public void action() {
+            ACLMessage message = new ACLMessage(ACLMessage.PROPOSE);
+            message.addReceiver(new AID(this.airport, AID.ISGUID));
+            message.setOntology("departure-plane");
             message.setContent(String.valueOf(this.airplane));
             this.myAgent.send(message);
         }
