@@ -39,6 +39,8 @@ public class Airport extends Agent {
 
                 switch (ontology) {
                     case "wants-passengers":
+                        System.out.println(this.myAgent.getName() + ": wants-passengers. QTD: " + msg.getContent());
+
                         ACLMessage reply = msg.createReply();
                         reply.setOntology("receive-passengers");
                         reply.setPerformative(ACLMessage.AGREE);

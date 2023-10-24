@@ -40,30 +40,10 @@ public class Airplane extends Agent {
         this.toAddress = (String) args[2];
 
         addBehaviour(new ReceiveMessages(this));
-        addBehaviour(new WantsPassengers(this, this.fromAddress, this.maxPassengersCapacity));
+        addBehaviour(new WantsPassengers(this));
+        // addBehaviour(new WantsFuel(this));
 
         System.out.println("Airplane " + this.getName() + " online.");
-    }
-
-    public static class WantsPassengers extends OneShotBehaviour {
-
-        private String airportAddress;
-        private int quantity;
-
-        public WantsPassengers(Agent agent, String airportAddress, int quantity) {
-            super(agent);
-            this.airportAddress = airportAddress;
-            this.quantity = quantity;
-        }
-
-        public void action() {
-            System.out.println("Airplane " + this.myAgent.getName() + " solicitando " + quantity + " passageiros ao " + airportAddress + ".");
-            ACLMessage message = new ACLMessage(ACLMessage.PROPOSE);
-            message.addReceiver(new AID(airportAddress, AID.ISGUID));
-            message.setOntology("wants-passengers");
-            message.setContent(String.valueOf(quantity));
-            this.myAgent.send(message);
-        }
     }
 
     public static class ReceiveMessages extends CyclicBehaviour {
@@ -83,8 +63,10 @@ public class Airplane extends Agent {
                 switch (ontology) {
                     case "receive-passengers":
                         airplane.passengers = Integer.parseInt(msg.getContent());
-                        System.out.println(this.myAgent.getName() + ": recebe-passageiro. QTD: " + airplane.passengers);
+                        System.out.println(this.myAgent.getName() + ": receive-passengers. QTD: " + airplane.passengers);
 
+                        break;
+                    case "receive-fuel":
                         break;
                     default:
                         block();
@@ -95,6 +77,27 @@ public class Airplane extends Agent {
             }
 
         }
+    }
+
+    public static class WantsPassengers extends OneShotBehaviour {
+
+        public WantsPassengers(Agent agent) {
+            super(agent);
+        }
+
+        public void action() {
+            Airplane airplane = (Airplane) this.myAgent;
+            String print = "Airplane " + airplane.getName() + " solicitando " + airplane.maxPassengersCapacity +
+                    " passageiros ao " + airplane.fromAddress + ".";
+            System.out.println(print);
+
+            ACLMessage message = new ACLMessage(ACLMessage.PROPOSE);
+            message.addReceiver(new AID(airplane.fromAddress, AID.ISGUID));
+            message.setOntology("wants-passengers");
+            message.setContent(String.valueOf(airplane.maxPassengersCapacity));
+            airplane.send(message);
+        }
+
     }
 
     // TODO Refazer essas funções
