@@ -82,6 +82,13 @@ public class ReceiveMessages extends CyclicBehaviour {
                 refresh4.addReceiver(new AID(msg.getContent(), AID.ISGUID));
                 refresh4.setOntology("arrival-finished");
                 controller.send(refresh4);
+
+                ACLMessage reply = msg.createReply();
+                reply.setOntology("new-travel");
+                reply.setPerformative(ACLMessage.AGREE);
+                reply.setContent(msg.getContent());
+                controller.send(reply);
+
                 break;
         }
     }

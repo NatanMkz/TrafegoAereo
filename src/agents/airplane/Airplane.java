@@ -30,9 +30,6 @@ public class Airplane extends Agent {
     public double routeConcluded;
 
     public Airplane() {
-    }
-
-    public void setup() {
         this.passengers = 0;
         this.fuel = 0;
         this.maintenance = 100;
@@ -41,7 +38,9 @@ public class Airplane extends Agent {
         this.routeConcluded = 0;
         this.fromAddress = "";
         this.toAddress = "";
+    }
 
+    public void setup() {
         System.out.println("Airplane " + this.getName() + " online.");
 
         this.maxPassengersCapacity = (int) getArguments()[0];

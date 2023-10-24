@@ -36,6 +36,9 @@ public class ReceiveMessages extends CyclicBehaviour {
                 case "autorize-arrival":
                     agent.addBehaviour(new ArrivalAutorize(agent));
                     break;
+                case "new-travel":
+                    agent.addBehaviour(new CreateNewTravel(agent, msg.getContent()));
+                    break;
             }
 
         } else {
