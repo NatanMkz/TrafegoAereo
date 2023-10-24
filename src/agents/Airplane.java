@@ -9,18 +9,16 @@ import jade.lang.acl.ACLMessage;
 public class Airplane extends Agent {
 
     /*
-    * 0 - Inicio
-    * 1 - Solicita combustivel
-    * 2 - Abastecido
-    * 3 - Solicita passageiros
-    * 4 - Embarcado
-    * 5 - Solicita Decolagem
-    * 6 - Aguardando autorização
-    * 7 - Autorizado
-    * 8 - Decolando
-    * 9 - Em percurso
-    * 10 - Finalizado
-    * */
+    todo
+     * 1 - Solicitando combustivel
+     * 2 - Abastecido
+     * 3 - Solicitando passageiros
+     * 4 - Embarcado
+     * 5 - Aguardando autorização
+     * 6 - Decolando
+     * 7 - Em percurso
+     * 0 - Finalizado
+     * */
     int status = 0;
     int passengers;
     double fuel;
@@ -45,12 +43,6 @@ public class Airplane extends Agent {
     }
 
     public void setup() {
-        /*
-         * TODO (comportamentos)
-         *   Comportamento que simula a porcentagem já voada do aeroporto A para o B
-         *   Comportamento para solicitar pouso da aeronave caso essa porcentagem seja superior a 90%
-         *
-         * */
 
         Object[] args = getArguments();
         this.maxPassengersCapacity = (int) args[0];
@@ -91,6 +83,29 @@ public class Airplane extends Agent {
                         airplane.status = 4;
 
                         break;
+
+                    case "autorize-departure":
+                        airplane.status = 6;
+                        airplane.addBehaviour(new OneShotBehaviour() {
+                            @Override
+                            public void action() {
+                                try {
+                                    Thread.sleep(5000);
+                                } catch (InterruptedException e) {
+                                    throw new RuntimeException(e);
+                                }
+
+                                Airplane airplane = ((Airplane) this.myAgent);
+                                ACLMessage message = new ACLMessage(ACLMessage.PROPOSE);
+                                message.addReceiver(new AID(airplane.controllerAddress, AID.ISGUID));
+                                message.setOntology("departure-finished");
+                                airplane.send(message);
+
+                                // TODO Iniciar comportamento de voo
+                            }
+                        });
+
+                        break;
                 }
 
             } else {
@@ -111,18 +126,6 @@ public class Airplane extends Agent {
 
             Airplane airplane = (Airplane) this.myAgent;
 
-            /*
-             * 1 - Solicitando combustivel
-             * 2 - Abastecido
-             * 3 - Solicitando passageiros
-             * 4 - Embarcado
-             * 5 - Aguardando autorização
-             * 6 - Autorizado
-             * 7 - Decolando
-             * 8 - Em percurso
-             * 0 - Finalizado
-             * */
-
             switch (airplane.status) {
                 case 0:
                     airplane.status = 1;
@@ -137,22 +140,11 @@ public class Airplane extends Agent {
                 case 4:
                     airplane.status = 5;
                     airplane.addBehaviour(new WantsDeparture(airplane));
-
                 default:
                     block();
 
                     break;
             }
-
-            // TODO Operação concluída quando ele finalizar a decolagem
-
-//            try {
-//                Thread.sleep(3000);
-//            } catch (InterruptedException e) {
-//                throw new RuntimeException(e);
-//            }
-
-
         }
     }
 
@@ -219,36 +211,5 @@ public class Airplane extends Agent {
         }
     }
 
-
-    // TODO Refazer essas funções
-//    public double ChecaQuantidadeCombustivel(double quantidadeGasta) {
-//        double combustivel = this.fuel;
-//        try {
-//            if (this.solicitaPouso == false && this.destino != "") {
-//                this.fuel = combustivel - quantidadeGasta;
-//            }
-//        } catch (Exception ex) {
-//            throw ex;
-//        }
-//
-//        return this.fuel;
-//    }
-    //    public boolean LiberaPouso(String rotaAtual) {
-//        boolean pouso = false;
-//        try {
-//            this.rotaAtual = rotaAtual;
-//            //usei pra atualizar a propriedade da rota e declarar que o pouso foi solicitado
-//            if (this.rotaAtual.equals(this.destino)) {
-//                this.solicitaPouso = true;
-//                //da pra colocar uns comandos pra ele interagir com o controle aereo e o aeroporto
-//                //por enquanto eu vou deixar o pouso como true para ter um retorno mas isso pode ser uma request para os agentes da torre e do aeroporto
-//                pouso = true;
-//            }
-//        } catch (Exception ex) {
-//            throw ex;
-//        }
-//
-//        return pouso;
-//    }
 
 }

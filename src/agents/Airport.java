@@ -27,6 +27,7 @@ public class Airport extends Agent {
         this.controllerAddress = (String) args[1];
 
         addBehaviour(new ReceiveMessages(this));
+        addBehaviour(new DepartureSchedule(this));
 
         System.out.println("Airport " + this.getName() + " online.");
     }
@@ -69,8 +70,25 @@ public class Airport extends Agent {
                     case "queue-plane":
                         System.out.println(airport.getName() + ": queue-plane. Airplane: " + msg.getContent());
                         airport.departureList.addLast(msg.getContent());
+                        ACLMessage message = new ACLMessage(ACLMessage.PROPOSE);
+                        message.addReceiver(new AID(airport.getName(), AID.ISGUID));
+                        message.setOntology("refresh");
+                        airport.send(message);
 
                         break;
+                    case "departure-finished":
+                        System.out.println(airport.getName() + ": departure-finished.");
+
+                        airport.hasPlaneDeparture = false;
+                        ACLMessage refresh = new ACLMessage(ACLMessage.PROPOSE);
+                        refresh.addReceiver(new AID(airport.getName(), AID.ISGUID));
+                        refresh.setOntology("refresh");
+                        airport.send(refresh);
+
+                        break;
+
+                    default:
+                        block();
                 }
 
             } else {
@@ -89,17 +107,20 @@ public class Airport extends Agent {
         public void action() {
             Airport airport = (Airport) this.myAgent;
 
-            if (airport.hasPlaneDeparture) {
+            if (!airport.hasPlaneDeparture && !airport.departureList.isEmpty()) {
+                airport.hasPlaneDeparture = true;
+                String airplane = airport.departureList.removeFirst();
+
+                System.out.println(airport.getName() + ": Departure-Schedule. Airplane: " + airplane);
+
+                ACLMessage message = new ACLMessage(ACLMessage.PROPOSE);
+                message.addReceiver(new AID(airport.controllerAddress, AID.ISGUID));
+                message.setOntology("autorize-departure");
+                message.setContent(airplane);
+                airport.send(message);
+            } else {
                 block();
             }
-
-            String airplane = airport.departureList.removeFirst();
-            ACLMessage message = new ACLMessage(ACLMessage.PROPOSE);
-            message.addReceiver(new AID(airport.controllerAddress, AID.ISGUID));
-            message.setOntology("wants-departure");
-            airport.send(message);
-
-            // Enviar pro avião que ele ta autorizado
         }
     }
 

@@ -110,11 +110,11 @@ public class Controller extends Agent {
 
             Controller controller = (Controller) this.myAgent;
             String ontology = msg.getOntology();
+            String airportAddress = "";
 
             switch (ontology) {
                 case "wants-departure":
                     System.out.println(controller.getName() + ": wants-departure. Airplane: " + msg.getSender().getName());
-                    String airportAddress = "";
 
                     for (AirportPlane airport : controller.airports) {
                         if (airport.planes.contains(msg.getSender().getName())) {
@@ -123,6 +123,31 @@ public class Controller extends Agent {
                     }
 
                     this.myAgent.addBehaviour(new QueueToAirport(controller, airportAddress, msg.getSender().getName()));
+
+                    break;
+                case "autorize-departure":
+                    System.out.println(controller.getName() + ": autorize-departure. Airplane: " + msg.getContent());
+
+                    ACLMessage messageA = new ACLMessage(ACLMessage.PROPOSE);
+                    messageA.addReceiver(new AID(msg.getContent(), AID.ISGUID));
+                    messageA.setOntology("autorize-departure");
+                    controller.send(messageA);
+
+                    break;
+                case "departure-finished":
+                    System.out.println(controller.getName() + ": departure-finished.");
+
+                    for (AirportPlane airport : controller.airports) {
+                        if (airport.planes.contains(msg.getSender().getName())) {
+                            airportAddress = airport.airport;
+                        }
+                    }
+
+                    ACLMessage refresh = new ACLMessage(ACLMessage.PROPOSE);
+                    refresh.addReceiver(new AID(airportAddress, AID.ISGUID));
+                    refresh.setOntology("departure-finished");
+                    controller.send(refresh);
+
 
                     break;
             }
