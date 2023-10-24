@@ -19,7 +19,11 @@ public class DepartureSchedule extends CyclicBehaviour {
         if (!airport.hasPlaneDeparture && !airport.departureList.isEmpty()) {
             airport.hasPlaneDeparture = true;
             String airplane = airport.departureList.removeFirst();
-
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             System.out.println(airport.getName() + ": Departure-Schedule. Airplane: " + airplane);
 
             ACLMessage message = new ACLMessage(ACLMessage.PROPOSE);

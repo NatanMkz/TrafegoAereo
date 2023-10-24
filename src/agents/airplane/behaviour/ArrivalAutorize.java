@@ -23,6 +23,11 @@ public class ArrivalAutorize extends OneShotBehaviour {
             throw new RuntimeException(e);
         }
 
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         System.out.println(agent.getName() + ": arrival-finished.");
 
         ACLMessage message = new ACLMessage(ACLMessage.PROPOSE);

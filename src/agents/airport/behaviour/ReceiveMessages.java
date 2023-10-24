@@ -22,6 +22,11 @@ public class ReceiveMessages extends CyclicBehaviour {
 
             switch (ontology) {
                 case "wants-passengers":
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
                     System.out.println(airport.getName() + ": wants-passengers. QTD: " + msg.getContent());
                     ACLMessage reply = msg.createReply();
                     reply.setOntology("receive-passengers");
@@ -31,6 +36,11 @@ public class ReceiveMessages extends CyclicBehaviour {
 
                     break;
                 case "wants-fuel":
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
                     System.out.println(this.myAgent.getName() + ": wants-fuel. QTD: " + msg.getContent());
                     ACLMessage replyFuel = msg.createReply();
                     replyFuel.setOntology("receive-fuel");
@@ -40,6 +50,11 @@ public class ReceiveMessages extends CyclicBehaviour {
 
                     break;
                 case "departure-plane":
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
                     System.out.println(airport.getName() + ": departure-plane. Airplane: " + msg.getContent());
                     airport.departureList.addLast(msg.getContent());
                     ACLMessage message = new ACLMessage(ACLMessage.PROPOSE);
@@ -49,6 +64,11 @@ public class ReceiveMessages extends CyclicBehaviour {
 
                     break;
                 case "departure-finished":
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
                     System.out.println(airport.getName() + ": departure-finished.");
                     airport.hasPlaneDeparture = false;
                     ACLMessage refresh = new ACLMessage(ACLMessage.PROPOSE);
@@ -58,6 +78,11 @@ public class ReceiveMessages extends CyclicBehaviour {
 
                     break;
                 case "arrival-plane":
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
                     System.out.println(airport.getName() + ": arrival-plane.");
                     airport.arrivalList.addLast(msg.getContent());
                     ACLMessage msg2 = new ACLMessage(ACLMessage.PROPOSE);
@@ -67,6 +92,11 @@ public class ReceiveMessages extends CyclicBehaviour {
 
                     break;
                 case "arrival-finished":
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
                     System.out.println(airport.getName() + ": arrival-finished.");
                     airport.hasPlaneArrival = false;
                     ACLMessage refresh3 = new ACLMessage(ACLMessage.PROPOSE);

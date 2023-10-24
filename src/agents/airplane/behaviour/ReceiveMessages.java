@@ -23,11 +23,21 @@ public class ReceiveMessages extends CyclicBehaviour {
                 case "receive-fuel":
                     agent.fuel = Integer.parseInt(msg.getContent());
                     agent.status = 2;
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
                     System.out.println(agent.getName() + " (message): receive-fuel. QTD: " + agent.fuel);
                     break;
                 case "receive-passengers":
                     agent.status = 4;
                     agent.passengers = Integer.parseInt(msg.getContent());
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
                     System.out.println(agent.getName() + " (message): receive-passengers. QTD: " + agent.passengers);
                     break;
                 case "autorize-departure":

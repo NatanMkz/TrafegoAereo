@@ -16,6 +16,12 @@ public class WantsArrival extends OneShotBehaviour {
     public void action() {
         Airplane agent = (Airplane) this.myAgent;
         agent.status = 8;
+
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         System.out.println(agent.getName() + ": Wants arrival to " + agent.toAddress + ".");
         ACLMessage message = new ACLMessage(ACLMessage.PROPOSE);
         message.addReceiver(new AID(agent.controllerAddress, AID.ISGUID));

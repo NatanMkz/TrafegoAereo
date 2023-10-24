@@ -21,6 +21,11 @@ public class CreateNewTravel extends OneShotBehaviour {
     public void action() {
         Airplane agent = ((Airplane) this.myAgent);
 
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         System.out.println(agent.getName() + ": new-travel.");
 
         String toAddress = agent.toAddress;

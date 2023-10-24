@@ -28,6 +28,11 @@ public class ReceiveMessages extends CyclicBehaviour {
 
         switch (ontology) {
             case "wants-departure":
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
                 System.out.println(controller.getName() + ": wants-departure. Airplane: " + msg.getSender().getName());
 
                 for (Controller.AirportPlane airport : controller.airports) {
@@ -40,6 +45,11 @@ public class ReceiveMessages extends CyclicBehaviour {
 
                 break;
             case "autorize-departure":
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
                 System.out.println(controller.getName() + ": autorize-departure. Airplane: " + msg.getContent());
 
                 ACLMessage messageA = new ACLMessage(ACLMessage.PROPOSE);
@@ -49,6 +59,11 @@ public class ReceiveMessages extends CyclicBehaviour {
 
                 break;
             case "departure-finished":
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
                 System.out.println(controller.getName() + ": departure-finished.");
 
                 for (Controller.AirportPlane airport : controller.airports) {
@@ -64,11 +79,21 @@ public class ReceiveMessages extends CyclicBehaviour {
 
                 break;
             case "wants-arrival":
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
                 System.out.println(controller.getName() + ": wants-arrival. Airplane: " + msg.getSender().getName());
                 this.myAgent.addBehaviour(new ArrivalToAirport(controller, msg.getContent(), msg.getSender().getName()));
 
                 break;
             case "autorize-arrival":
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
                 System.out.println(controller.getName() + ": autorize-arrival. Airplane: " + msg.getContent());
                 ACLMessage messageB = new ACLMessage(ACLMessage.PROPOSE);
                 messageB.addReceiver(new AID(msg.getContent(), AID.ISGUID));
@@ -77,6 +102,11 @@ public class ReceiveMessages extends CyclicBehaviour {
 
                 break;
             case "arrival-finished":
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
                 System.out.println(controller.getName() + ": arrival-finished.");
                 ACLMessage refresh4 = new ACLMessage(ACLMessage.PROPOSE);
                 refresh4.addReceiver(new AID(msg.getContent(), AID.ISGUID));
@@ -86,7 +116,28 @@ public class ReceiveMessages extends CyclicBehaviour {
                 ACLMessage reply = msg.createReply();
                 reply.setOntology("new-travel");
                 reply.setPerformative(ACLMessage.AGREE);
-                reply.setContent(msg.getContent());
+
+                String newAirportAddress = "";
+
+                for (Controller.AirportPlane airport : controller.airports) {
+                    if (!airport.planes.contains(msg.getSender().getName())) {
+                        newAirportAddress = airport.airport;
+                        airport.planes.add(msg.getSender().getName());
+
+                        break;
+                    }
+                }
+
+                for (Controller.AirportPlane airport : controller.airports) {
+                    if (airport.planes.contains(msg.getSender().getName())) {
+                        airport.planes.remove(msg.getSender().getName());
+
+                        break;
+                    }
+                }
+
+
+                reply.setContent(newAirportAddress);
                 controller.send(reply);
 
                 break;

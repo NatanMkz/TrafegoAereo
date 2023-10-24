@@ -7,7 +7,7 @@ import jade.core.behaviours.TickerBehaviour;
 public class FlightOperation extends TickerBehaviour {
 
     public FlightOperation(Agent a) {
-        super(a, 10);
+        super(a, 500);
     }
 
     @Override
@@ -25,6 +25,7 @@ public class FlightOperation extends TickerBehaviour {
         boolean concluded = (agent.routeConcluded == 100);
         agent.fuel -= 0.5;
         agent.maintenance -= 0.2;
+
         System.out.println(agent.getName() + ": On flight... " + agent.routeConcluded + "%.");
 
         if ((agent.status == 7) && concluded) {

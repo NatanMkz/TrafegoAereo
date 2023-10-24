@@ -20,6 +20,11 @@ public class ArrivalSchedule extends CyclicBehaviour {
             airport.hasPlaneArrival = true;
             String airplane = airport.arrivalList.removeFirst();
 
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             System.out.println(airport.getName() + ": Arrival-Schedule. Airplane: " + airplane);
 
             ACLMessage message = new ACLMessage(ACLMessage.PROPOSE);
